@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="hi-Latn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arshubot | chat bot jo tumhare rules pe chale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1E1B4B; --violet:#7C3AED; --cyan:#22D3EE; --sun:#FDE047;
+    --pink:#F472B6; --sky:#BAE6FD; --paper:#FFFFFF; --mist:#EEF9FF;
+    --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+    --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; font-family:var(--body); color:var(--ink); font-size:17px; line-height:1.55;
+    background-color:var(--sky);
+    background-image:radial-gradient(rgba(255,255,255,.75) 2.5px, transparent 3px);
+    background-size:44px 44px;
+  }
+  button,input{font:inherit;color:inherit}
+  :focus-visible{outline:3px solid var(--violet);outline-offset:3px;border-radius:8px}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 18px}
+
+  /* top bar */
+  .top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:26px}
+  .brand svg{width:46px;height:46px}
+
+  /* buttons */
+  .btn{
+    border:3px solid var(--ink);background:var(--sun);border-radius:16px;
+    padding:10px 18px;font-weight:800;cursor:pointer;box-shadow:4px 4px 0 var(--ink);
+    transition:transform .08s, box-shadow .08s;
+  }
+  .btn:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}
+  .btn.pink{background:var(--pink)}
+  .btn.cyan{background:var(--cyan)}
+  .btn.ghost{background:var(--paper)}
+  .btn.small{padding:6px 12px;box-shadow:3px 3px 0 var(--ink);border-radius:12px;font-size:15px}
+  .btn.small:active{transform:translate(3px,3px)}
+
+  /* hero */
+  .hero{display:grid;gap:28px;padding:14px 0 44px;align-items:center}
+  .hero-mascot{width:132px;height:132px;margin-bottom:6px}
+  h1{font-family:var(--display);font-weight:800;font-size:clamp(38px,9vw,64px);line-height:1.02;margin:0 0 14px}
+  .lead{font-size:19px;max-width:34ch;margin:0 0 22px}
+
+  .chat{border:3px solid var(--ink);border-radius:22px;background:var(--paper);box-shadow:6px 6px 0 var(--ink);overflow:hidden}
+  .chat-head{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--cyan);border-bottom:3px solid var(--ink);padding:10px 14px;font-weight:800}
+  .live{display:inline-flex;align-items:center;gap:7px}
+  .live i{width:11px;height:11px;border-radius:50%;background:#EF4444;border:2px solid var(--ink);display:inline-block}
+  .chat-body{padding:14px;min-height:264px;display:flex;flex-direction:column;gap:10px}
+  .msg{display:flex;gap:8px;align-items:flex-start;animation:pop .28s ease-out both}
+  .msg b{white-space:nowrap}
+  .msg span{overflow-wrap:anywhere}
+  .msg.flag span{background:#FCE7F3;border:2px dashed var(--pink);border-radius:10px;padding:0 8px;letter-spacing:.08em}
+  .msg.bot{background:var(--sun);border:3px solid var(--ink);border-radius:14px;padding:8px 10px;align-items:center}
+  .msg.bot svg{width:30px;height:30px;flex:none}
+  @keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+
+  /* sections */
+  section.panel-zone{padding:8px 0 40px}
+  h2{font-family:var(--display);font-weight:800;font-size:clamp(28px,6vw,40px);line-height:1.1;margin:0 0 6px}
+  .sub{margin:0 0 22px;max-width:52ch}
+  .grid{display:grid;gap:18px}
+  .panel{border:3px solid var(--ink);border-radius:20px;background:var(--paper);padding:18px;box-shadow:5px 5px 0 var(--ink)}
+  .panel h3{font-family:var(--display);font-weight:800;font-size:22px;margin:0 0 4px;line-height:1.2}
+  .panel p.help{margin:0 0 12px;font-size:15px;opacity:.85}
+  .panel.tint{background:var(--mist)}
+
+  /* rows */
+  .row{display:flex;gap:10px;align-items:center}
+  .row.between{justify-content:space-between}
+  .stack{display:grid;gap:10px}
+  input[type=text],input[type=number]{
+    width:100%;border:3px solid var(--ink);border-radius:14px;padding:9px 12px;background:var(--paper);min-width:0
+  }
+  .add{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:12px}
+  .add.two{grid-template-columns:1fr}
+  .add.two .row{display:grid;grid-template-columns:1fr;gap:10px}
+
+  /* chips */
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{display:inline-flex;align-items:center;gap:6px;border:2.5px solid var(--ink);border-radius:999px;background:var(--sun);padding:3px 6px 3px 12px;font-weight:700}
+  .chip.blue{background:var(--sky)}
+  .x{border:0;background:var(--ink);color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;line-height:1;font-weight:800}
+  .empty{margin:0;padding:12px;border:2.5px dashed var(--ink);border-radius:14px;font-size:15px}
+
+  /* switch */
+  .switch{width:58px;height:34px;border:3px solid var(--ink);border-radius:999px;background:#CBD5E1;position:relative;cursor:pointer;flex:none;padding:0}
+  .switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--paper);border:3px solid var(--ink);transition:transform .15s}
+  .switch[aria-checked="true"]{background:var(--cyan)}
+  .switch[aria-checked="true"]::after{transform:translateX(24px)}
+  .toggle-row{padding:10px 0;border-top:2.5px solid var(--sky)}
+  .toggle-row:first-of-type{border-top:0;padding-top:0}
+  .toggle-row strong{display:block;line-height:1.2}
+  .toggle-row small{opacity:.8}
+
+  /* timeouts */
+  .t-row{display:grid;grid-template-columns:1fr 112px;gap:10px;align-items:center}
+  .t-row label{font-weight:800;line-height:1.2}
+  .t-row small{display:block;font-weight:400;opacity:.85}
+  .err{color:#B91C1C;font-size:14px;margin:4px 0 0;min-height:1em}
+
+  /* commands */
+  .cmd{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;border:2.5px solid var(--ink);border-radius:14px;padding:8px 10px;background:var(--mist)}
+  .cmd code{font-weight:800;background:var(--sun);border:2px solid var(--ink);border-radius:8px;padding:1px 8px}
+  .cmd span{overflow-wrap:anywhere;font-size:15px}
+
+  /* output */
+  .out{background:var(--ink);color:#E0F2FE;border-radius:20px;border:3px solid var(--ink);padding:18px;box-shadow:5px 5px 0 var(--violet)}
+  .out h3{color:#fff}
+  .out p.help{color:#BAE6FD}
+  pre{margin:0 0 14px;padding:14px;border-radius:14px;background:#0F0D2E;color:#67E8F9;overflow:auto;max-height:340px;font-size:14px;line-height:1.5;border:2px solid #312E81}
+  .out .btns{display:flex;flex-wrap:wrap;gap:12px}
+  .note{margin:14px 0 0;font-size:15px;color:#BAE6FD}
+
+  .toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,30px);opacity:0;pointer-events:none;
+    background:var(--ink);color:#fff;border:3px solid var(--sun);border-radius:14px;padding:10px 16px;font-weight:700;max-width:90vw;text-align:center;transition:.2s;z-index:10}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  footer{padding:10px 0 40px;font-weight:700}
+
+  @media (min-width:860px){
+    .hero{grid-template-columns:1.05fr 1fr;padding-top:28px}
+    .grid{grid-template-columns:1fr 1fr;align-items:start}
+    .span2{grid-column:1 / -1}
+    .add.two .row{grid-template-columns:170px 1fr}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .msg{animation:none}
+    html{scroll-behavior:auto}
+    .switch::after,.btn,.toast{transition:none}
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="bot" viewBox="50 48 280 264">
+    <line x1="190" y1="116" x2="190" y2="78" stroke="#1E1B4B" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="190" cy="68" r="15" fill="#F472B6" stroke="#1E1B4B" stroke-width="6"/>
+    <circle cx="74" cy="206" r="22" fill="#A78BFA" stroke="#1E1B4B" stroke-width="6"/>
+    <circle cx="306" cy="206" r="22" fill="#A78BFA" stroke="#1E1B4B" stroke-width="6"/>
+    <rect x="82" y="112" width="216" height="192" rx="82" fill="#FFFFFF" stroke="#1E1B4B" stroke-width="7"/>
+    <rect x="108" y="146" width="164" height="110" rx="50" fill="#312E81"/>
+    <ellipse cx="150" cy="196" rx="21" ry="27" fill="#22D3EE"/>
+    <ellipse cx="230" cy="196" rx="21" ry="27" fill="#22D3EE"/>
+    <circle cx="157" cy="185" r="8" fill="#FFFFFF"/>
+    <circle cx="237" cy="185" r="8" fill="#FFFFFF"/>
+    <circle cx="126" cy="230" r="10" fill="#F472B6"/>
+    <circle cx="254" cy="230" r="10" fill="#F472B6"/>
+    <path d="M174 230 Q190 246 206 230" fill="none" stroke="#22D3EE" stroke-width="6" stroke-linecap="round"/>
+  </symbol>
+</svg>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><svg role="img" aria-label="Arshubot"><use href="#bot"/></svg>Arshubot</div>
+    <button class="btn ghost small" id="loginBtn" type="button">Google se login</button>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <svg class="hero-mascot" role="img" aria-label="Arshubot robot"><use href="#bot"/></svg>
+        <h1>Chat tumhari, rules bhi tumhare.</h1>
+        <p class="lead">Arshubot gaali aur spam pe turant timeout deta hai. Kaunse words band karne hain aur kitni der ka timeout, ye tum tay karo.</p>
+        <a href="#settings"><button class="btn pink" type="button">Settings badlo</button></a>
+      </div>
+
+      <div class="chat" aria-label="Arshubot ka live chat demo">
+        <div class="chat-head">
+          <span class="live"><i></i>Live chat</span>
+          <button class="btn small ghost" id="replay" type="button">Dobara dikhao</button>
+        </div>
+        <div class="chat-body" id="chat" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <section class="panel-zone" id="settings">
+      <h2>Bot ki settings</h2>
+      <p class="sub">Jo badloge, wo neeche settings.json mein turant dikhega. Wahi file bot padhta hai.</p>
+
+      <div class="grid">
+        <div class="panel">
+          <div class="row between">
+            <div>
+              <h3>Bot</h3>
+              <p class="help" style="margin:0" id="enabledHelp">Bot chalu hai.</p>
+            </div>
+            <button class="switch" id="sw-enabled" role="switch" aria-checked="true" aria-label="Bot chalu ya band"></button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Timeout kitni der ka</h3>
+          <p class="help">Har galti pe timeout badhta jata hai. Second mein likho, 10 se 86400 tak.</p>
+          <div class="stack">
+            <div>
+              <div class="t-row"><label for="t0">Pehli galti<small id="h0"></small></label><input type="number" id="t0" min="10" max="86400" inputmode="numeric"></div>
+            </div>
+            <div>
+              <div class="t-row"><label for="t1">Doosri galti<small id="h1"></small></label><input type="number" id="t1" min="10" max="86400" inputmode="numeric"></div>
+            </div>
+            <div>
+              <div class="t-row"><label for="t2">Teesri galti aur uske baad<small id="h2"></small></label><input type="number" id="t2" min="10" max="86400" inputmode="numeric"></div>
+            </div>
+          </div>
+          <p class="err" id="terr" role="alert"></p>
+        </div>
+
+        <div class="panel span2">
+          <h3>Band words</h3>
+          <p class="help">Chhote words (4 letters tak) poore word ki tarah match hote hain, taaki galat log na pakde jaayein. Lambe words kahin bhi milein to pakde jaate hain.</p>
+          <div class="add">
+            <input type="text" id="wordIn" placeholder="naya word likho" maxlength="30" autocomplete="off" aria-label="Naya band word">
+            <button class="btn small" id="wordAdd" type="button">Word jodo</button>
+          </div>
+          <div class="chips" id="words"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Kya pakadna hai</h3>
+          <p class="help">Jo band karoge, bot use nahi pakdega.</p>
+          <div id="filters"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Ye log safe hain</h3>
+          <p class="help">Channel owner aur moderators hamesha safe hain. Baaki dosto ke channel ke naam yahan jodo.</p>
+          <div class="add">
+            <input type="text" id="wlIn" placeholder="channel ka naam" maxlength="40" autocomplete="off" aria-label="Safe log ka naam">
+            <button class="btn small cyan" id="wlAdd" type="button">Naam jodo</button>
+          </div>
+          <div class="chips" id="wl"></div>
+        </div>
+
+        <div class="panel span2 tint">
+          <h3>Commands</h3>
+          <p class="help">Viewer command likhe to bot ye jawab deta hai. Ek command 5 second mein ek hi baar chalta hai.</p>
+          <div class="add two">
+            <div class="row">
+              <input type="text" id="cmdName" placeholder="!discord" maxlength="20" autocomplete="off" aria-label="Command ka naam">
+              <input type="text" id="cmdReply" placeholder="Jawab likho" maxlength="190" autocomplete="off" aria-label="Command ka jawab">
+            </div>
+            <div><button class="btn small" id="cmdAdd" type="button">Command jodo</button></div>
+          </div>
+          <div class="stack" id="cmds" style="margin-top:12px"></div>
+        </div>
+
+        <div class="out span2">
+          <h3>settings.json</h3>
+          <p class="help">Ye tumhari abhi ki settings hain.</p>
+          <pre id="json" tabindex="0" aria-label="settings.json ka preview"></pre>
+          <div class="btns">
+            <button class="btn cyan" id="copy" type="button">Copy settings</button>
+            <button class="btn" id="download" type="button">Download settings.json</button>
+          </div>
+          <p class="note">Abhi ye file bot chalane wale ko dena hai, wo ise bot ke folder mein rakhta hai. Login aur online save agle version mein aayenge.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>Arshubot</footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  var defaults = {
+    enabled: true,
+    banned_words: ["madarchod","behenchod","bhosdike","chutiya","gandu","harami","mc","bc","mkc","lund","randi","gaand"],
+    timeouts: [60,300,1800],
+    filters: { links:true, caps:true, repeat:true, fast_spam:true },
+    commands: {
+      "!hello":"Namaste! Main Arshubot hu",
+      "!about":"Arshubot: fast Hinglish chat moderation bot",
+      "!ping":"pong"
+    },
+    whitelist: []
+  };
+  var state = JSON.parse(JSON.stringify(defaults));
+
+  var FILTERS = [
+    ["links","Links","Link bhejne wale ko timeout"],
+    ["caps","Zyada CAPS","Sab kuch bade akshar mein likhne wale ko timeout"],
+    ["repeat","Ek hi message baar baar","Ek hi message 3 baar bhejne wale ko timeout"],
+    ["fast_spam","Bahut tez messages","6 second mein 5 ya zyada messages bhejne wale ko timeout"]
+  ];
+
+  function $(id){ return document.getElementById(id); }
+
+  function fmtDur(s){
+    if (s < 60) return s + " sec";
+    if (s < 3600){ var m = Math.floor(s/60), r = s%60; return m + " min" + (r ? " " + r + " sec" : ""); }
+    var h = Math.floor(s/3600), mm = Math.floor((s%3600)/60);
+    return h + " ghanta" + (mm ? " " + mm + " min" : "");
+  }
+
+  var toastTimer;
+  function toast(msg){
+    var t = $("toast"); t.textContent = msg; t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2600);
+  }
+
+  /* ---------- rendering ---------- */
+  function renderEnabled(){
+    var sw = $("sw-enabled");
+    sw.setAttribute("aria-checked", String(state.enabled));
+    $("enabledHelp").textContent = state.enabled ? "Bot chalu hai." : "Bot band hai. Chat mein kuch nahi karega.";
+  }
+
+  function chip(text, cls, onRemove){
+    var c = document.createElement("span"); c.className = "chip " + (cls || "");
+    var s = document.createElement("span"); s.textContent = text;
+    var b = document.createElement("button"); b.type = "button"; b.className = "x";
+    b.textContent = "\u00d7"; b.setAttribute("aria-label", text + " hatao");
+    b.addEventListener("click", onRemove);
+    c.appendChild(s); c.appendChild(b); return c;
+  }
+
+  function renderWords(){
+    var box = $("words"); box.innerHTML = "";
+    if (!state.banned_words.length){
+      var p = document.createElement("p"); p.className = "empty";
+      p.textContent = "Abhi koi band word nahi hai. Upar se pehla word jodo."; box.appendChild(p); return;
+    }
+    state.banned_words.forEach(function(w, i){
+      box.appendChild(chip(w, "", function(){ state.banned_words.splice(i,1); renderWords(); renderJSON(); }));
+    });
+  }
+
+  function renderWl(){
+    var box = $("wl"); box.innerHTML = "";
+    if (!state.whitelist.length){
+      var p = document.createElement("p"); p.className = "empty";
+      p.textContent = "Abhi koi naam nahi hai."; box.appendChild(p); return;
+    }
+    state.whitelist.forEach(function(w, i){
+      box.appendChild(chip(w, "blue", function(){ state.whitelist.splice(i,1); renderWl(); renderJSON(); }));
+    });
+  }
+
+  function renderFilters(){
+    var box = $("filters"); box.innerHTML = "";
+    FILTERS.forEach(function(f){
+      var row = document.createElement("div"); row.className = "toggle-row row between";
+      var txt = document.createElement("div");
+      var st = document.createElement("strong"); st.textContent = f[1];
+      var sm = document.createElement("small"); sm.textContent = f[2];
+      txt.appendChild(st); txt.appendChild(sm);
+      var sw = document.createElement("button"); sw.type = "button"; sw.className = "switch";
+      sw.setAttribute("role","switch"); sw.setAttribute("aria-label", f[1]);
+      sw.setAttribute("aria-checked", String(state.filters[f[0]]));
+      sw.addEventListener("click", function(){
+        state.filters[f[0]] = !state.filters[f[0]];
+        sw.setAttribute("aria-checked", String(state.filters[f[0]]));
+        renderJSON();
+      });
+      row.appendChild(txt); row.appendChild(sw); box.appendChild(row);
+    });
+  }
+
+  function renderCmds(){
+    var box = $("cmds"); box.innerHTML = "";
+    var names = Object.keys(state.commands);
+    if (!names.length){
+      var p = document.createElement("p"); p.className = "empty";
+      p.textContent = "Abhi koi command nahi hai. Upar se pehla command jodo."; box.appendChild(p); return;
+    }
+    names.forEach(function(n){
+      var r = document.createElement("div"); r.className = "cmd";
+      var c = document.createElement("code"); c.textContent = n;
+      var s = document.createElement("span"); s.textContent = state.commands[n];
+      var b = document.createElement("button"); b.type = "button"; b.className = "x";
+      b.textContent = "\u00d7"; b.setAttribute("aria-label", n + " hatao");
+      b.addEventListener("click", function(){ delete state.commands[n]; renderCmds(); renderJSON(); });
+      r.appendChild(c); r.appendChild(s); r.appendChild(b); box.appendChild(r);
+    });
+  }
+
+  function renderJSON(){
+    $("json").textContent = JSON.stringify(state, null, 2);
+    updateDemoText();
+  }
+
+  function renderTimeoutHints(){
+    for (var i = 0; i < 3; i++){ $("h" + i).textContent = fmtDur(state.timeouts[i]); }
+  }
+
+  /* ---------- inputs ---------- */
+  function cleanWord(v){ return v.toLowerCase().replace(/\s+/g, "").slice(0, 30); }
+
+  function addWord(){
+    var inp = $("wordIn"), w = cleanWord(inp.value);
+    if (!w){ toast("Pehle word likho"); return; }
+    if (state.banned_words.indexOf(w) !== -1){ toast("Ye word pehle se list mein hai"); return; }
+    state.banned_words.push(w); inp.value = ""; renderWords(); renderJSON(); inp.focus();
+  }
+  function addWl(){
+    var inp = $("wlIn"), w = inp.value.trim().slice(0, 40);
+    if (!w){ toast("Pehle naam likho"); return; }
+    if (state.whitelist.indexOf(w) !== -1){ toast("Ye naam pehle se list mein hai"); return; }
+    state.whitelist.push(w); inp.value = ""; renderWl(); renderJSON(); inp.focus();
+  }
+  function addCmd(){
+    var n = $("cmdName").value.trim().toLowerCase().replace(/\s+/g, "");
+    var r = $("cmdReply").value.trim();
+    if (!n || !r){ toast("Command aur jawab dono likho"); return; }
+    if (n.charAt(0) !== "!") n = "!" + n;
+    if (n.length < 2){ toast("Command ka naam likho"); return; }
+    state.commands[n] = r.slice(0, 190);
+    $("cmdName").value = ""; $("cmdReply").value = "";
+    renderCmds(); renderJSON();
+  }
+
+  $("wordAdd").addEventListener("click", addWord);
+  $("wordIn").addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); addWord(); } });
+  $("wlAdd").addEventListener("click", addWl);
+  $("wlIn").addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); addWl(); } });
+  $("cmdAdd").addEventListener("click", addCmd);
+  $("cmdReply").addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); addCmd(); } });
+
+  $("sw-enabled").addEventListener("click", function(){ state.enabled = !state.enabled; renderEnabled(); renderJSON(); });
+
+  [0,1,2].forEach(function(i){
+    var inp = $("t" + i);
+    inp.value = state.timeouts[i];
+    inp.addEventListener("input", function(){
+      var v = parseInt(inp.value, 10);
+      if (isNaN(v) || v < 10 || v > 86400){
+        $("terr").textContent = "Timeout 10 se 86400 second ke beech hona chahiye.";
+        return;
+      }
+      $("terr").textContent = "";
+      state.timeouts[i] = v; renderTimeoutHints(); renderJSON();
+    });
+    inp.addEventListener("change", function(){ inp.value = state.timeouts[i]; $("terr").textContent = ""; });
+  });
+
+  /* ---------- copy / download ---------- */
+  function jsonText(){ return JSON.stringify(state, null, 2); }
+
+  $("copy").addEventListener("click", function(){
+    var text = jsonText();
+    function fallback(){
+      var ta = document.createElement("textarea"); ta.value = text;
+      ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch(e){}
+      document.body.removeChild(ta);
+      toast(ok ? "Settings copy ho gayi" : "Copy nahi hui. Download wala button try karo.");
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ toast("Settings copy ho gayi"); }, fallback);
+    } else { fallback(); }
+  });
+
+  $("download").addEventListener("click", function(){
+    var blob = new Blob([jsonText()], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a"); a.href = url; a.download = "settings.json";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    toast("settings.json download ho rahi hai");
+  });
+
+  $("loginBtn").addEventListener("click", function(){
+    toast("Google login abhi ready nahi hai. Abhi neeche se settings.json lo.");
+  });
+
+  /* ---------- hero chat demo ---------- */
+  var chat = $("chat"), timers = [], botTimeoutEl = null;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function timeoutLine(){ return "@spamking gaali ki wajah se " + fmtDur(state.timeouts[0]) + " ka timeout"; }
+  function updateDemoText(){ if (botTimeoutEl) botTimeoutEl.textContent = timeoutLine(); }
+
+  function userMsg(name, text, color, flagged){
+    var m = document.createElement("div"); m.className = "msg" + (flagged ? " flag" : "");
+    var b = document.createElement("b"); b.style.color = color; b.textContent = name;
+    var s = document.createElement("span"); s.textContent = text;
+    m.appendChild(b); m.appendChild(s); return m;
+  }
+  function botMsg(text){
+    var m = document.createElement("div"); m.className = "msg bot";
+    var ns = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(ns, "svg"); svg.setAttribute("aria-hidden", "true");
+    var use = document.createElementNS(ns, "use"); use.setAttribute("href", "#bot"); svg.appendChild(use);
+    var s = document.createElement("span"); s.textContent = text;
+    m.appendChild(svg); m.appendChild(s); return { el: m, txt: s };
+  }
+
+  function runDemo(){
+    timers.forEach(clearTimeout); timers = []; chat.innerHTML = ""; botTimeoutEl = null;
+    var steps = [
+      function(){ chat.appendChild(userMsg("riya_gamer", "bhai aaj ka stream mast hai", "#7C3AED")); },
+      function(){ chat.appendChild(userMsg("vikas99", "!ping", "#0E7490")); },
+      function(){ chat.appendChild(botMsg("pong").el); },
+      function(){ chat.appendChild(userMsg("spamking", "\u2022\u2022\u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022\u2022", "#BE185D", true)); },
+      function(){ var b = botMsg(timeoutLine()); botTimeoutEl = b.txt; chat.appendChild(b.el); }
+    ];
+    steps.forEach(function(fn, i){
+      if (reduce){ fn(); } else { timers.push(setTimeout(fn, 500 + i * 1000)); }
+    });
+  }
+  $("replay").addEventListener("click", runDemo);
+
+  /* ---------- init ---------- */
+  renderEnabled(); renderWords(); renderWl(); renderFilters(); renderCmds();
+  renderTimeoutHints(); renderJSON(); runDemo();
+})();
+</script>
+</body>
+</html>
