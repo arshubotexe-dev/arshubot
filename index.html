@@ -1,138 +1,187 @@
 <!DOCTYPE html>
-<html lang="hi-Latn">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Arshubot | chat bot jo tumhare rules pe chale</title>
+<title>Arshubot — moderation for YouTube live chat</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#1E1B4B; --violet:#7C3AED; --cyan:#22D3EE; --sun:#FDE047;
-    --pink:#F472B6; --sky:#BAE6FD; --paper:#FFFFFF; --mist:#EEF9FF;
-    --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
-    --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --bg:#07061a; --bg2:#0c0a26;
+    --violet:#8B5CF6; --violet-soft:#A78BFA; --violet-deep:#5B21B6;
+    --cyan:#22D3EE;
+    --ink:#EDEBFF; --muted:#A6A1D6; --muted2:#7A76AE;
+    --line:rgba(139,92,246,.35); --line-soft:rgba(139,92,246,.18);
+    --card:linear-gradient(180deg, rgba(139,92,246,.10), rgba(139,92,246,.02));
+    --danger:#F472B6;
+    --display:"Sora",system-ui,sans-serif;
+    --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --radius:20px;
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{
-    margin:0; font-family:var(--body); color:var(--ink); font-size:17px; line-height:1.55;
-    background-color:var(--sky);
-    background-image:radial-gradient(rgba(255,255,255,.75) 2.5px, transparent 3px);
-    background-size:44px 44px;
+    margin:0; font-family:var(--body); color:var(--ink); font-size:16px; line-height:1.6;
+    background:
+      radial-gradient(680px 420px at 12% -8%, rgba(139,92,246,.30), transparent 60%),
+      radial-gradient(560px 380px at 100% 8%, rgba(34,211,238,.16), transparent 60%),
+      radial-gradient(900px 600px at 50% 110%, rgba(139,92,246,.16), transparent 60%),
+      var(--bg);
+    background-attachment:fixed;
+  }
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.5;
+    background-image:
+      radial-gradient(1.4px 1.4px at 20% 30%, rgba(237,235,255,.55) 100%, transparent),
+      radial-gradient(1.4px 1.4px at 70% 65%, rgba(237,235,255,.4) 100%, transparent),
+      radial-gradient(1.1px 1.1px at 40% 80%, rgba(237,235,255,.4) 100%, transparent),
+      radial-gradient(1.1px 1.1px at 85% 20%, rgba(237,235,255,.45) 100%, transparent),
+      radial-gradient(1.6px 1.6px at 90% 85%, rgba(237,235,255,.35) 100%, transparent);
+    background-repeat:repeat; background-size:340px 340px;
   }
   button,input{font:inherit;color:inherit}
-  :focus-visible{outline:3px solid var(--violet);outline-offset:3px;border-radius:8px}
-  .wrap{max-width:1040px;margin:0 auto;padding:0 18px}
+  :focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:8px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px;position:relative;z-index:1}
+  a{color:inherit}
 
-  /* top bar */
-  .top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0}
-  .brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:26px}
-  .brand svg{width:46px;height:46px}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo svg{width:34px;height:34px;flex:none;filter:drop-shadow(0 0 10px rgba(139,92,246,.65))}
+  .logo b{font-family:var(--display);font-weight:800;font-size:21px;letter-spacing:.01em;
+    background:linear-gradient(90deg,#fff,var(--violet-soft) 65%,var(--cyan));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
 
-  /* buttons */
+  .top{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:22px 0}
+
   .btn{
-    border:3px solid var(--ink);background:var(--sun);border-radius:16px;
-    padding:10px 18px;font-weight:800;cursor:pointer;box-shadow:4px 4px 0 var(--ink);
-    transition:transform .08s, box-shadow .08s;
+    display:inline-flex;align-items:center;gap:8px;justify-content:center;
+    border:1px solid var(--line);background:rgba(139,92,246,.10);border-radius:999px;
+    padding:11px 20px;font-weight:600;font-size:15px;cursor:pointer;color:var(--ink);
+    transition:border-color .15s, background .15s, box-shadow .15s, transform .08s;
   }
-  .btn:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}
-  .btn.pink{background:var(--pink)}
-  .btn.cyan{background:var(--cyan)}
-  .btn.ghost{background:var(--paper)}
-  .btn.small{padding:6px 12px;box-shadow:3px 3px 0 var(--ink);border-radius:12px;font-size:15px}
-  .btn.small:active{transform:translate(3px,3px)}
+  .btn:hover{border-color:rgba(139,92,246,.7);background:rgba(139,92,246,.18)}
+  .btn:active{transform:translateY(1px)}
+  .btn.glow{background:linear-gradient(90deg,var(--violet),#6D28D9);border-color:transparent;
+    box-shadow:0 8px 28px -8px rgba(139,92,246,.75)}
+  .btn.glow:hover{box-shadow:0 10px 32px -6px rgba(139,92,246,.9)}
+  .btn.ghost{background:transparent}
+  .btn.small{padding:7px 14px;font-size:13.5px}
+  .btn.block{width:100%}
 
-  /* hero */
-  .hero{display:grid;gap:28px;padding:14px 0 44px;align-items:center}
-  .hero-mascot{width:132px;height:132px;margin-bottom:6px}
-  h1{font-family:var(--display);font-weight:800;font-size:clamp(38px,9vw,64px);line-height:1.02;margin:0 0 14px}
-  .lead{font-size:19px;max-width:34ch;margin:0 0 22px}
+  .hero{display:grid;gap:40px;padding:26px 0 10px;align-items:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--violet-soft);
+    border:1px solid var(--line);border-radius:999px;padding:6px 13px;background:rgba(139,92,246,.08);margin-bottom:18px}
+  .eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);display:inline-block}
+  h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,7.4vw,54px);line-height:1.08;margin:0 0 16px;letter-spacing:-.01em}
+  h1 .grad{background:linear-gradient(90deg,var(--violet-soft),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lead{font-size:17.5px;color:var(--muted);max-width:42ch;margin:0 0 26px}
+  .cta-row{display:flex;flex-wrap:wrap;gap:12px}
 
-  .chat{border:3px solid var(--ink);border-radius:22px;background:var(--paper);box-shadow:6px 6px 0 var(--ink);overflow:hidden}
-  .chat-head{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--cyan);border-bottom:3px solid var(--ink);padding:10px 14px;font-weight:800}
-  .live{display:inline-flex;align-items:center;gap:7px}
-  .live i{width:11px;height:11px;border-radius:50%;background:#EF4444;border:2px solid var(--ink);display:inline-block}
-  .chat-body{padding:14px;min-height:264px;display:flex;flex-direction:column;gap:10px}
-  .msg{display:flex;gap:8px;align-items:flex-start;animation:pop .28s ease-out both}
-  .msg b{white-space:nowrap}
-  .msg span{overflow-wrap:anywhere}
-  .msg.flag span{background:#FCE7F3;border:2px dashed var(--pink);border-radius:10px;padding:0 8px;letter-spacing:.08em}
-  .msg.bot{background:var(--sun);border:3px solid var(--ink);border-radius:14px;padding:8px 10px;align-items:center}
-  .msg.bot svg{width:30px;height:30px;flex:none}
-  @keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+  .badges{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:34px}
+  .badge{border:1px solid var(--line-soft);border-radius:16px;padding:14px 12px;background:rgba(139,92,246,.05);text-align:left}
+  .badge b{display:block;font-family:var(--display);font-weight:700;font-size:15px;margin-bottom:3px}
+  .badge span{font-size:13px;color:var(--muted2)}
 
-  /* sections */
-  section.panel-zone{padding:8px 0 40px}
-  h2{font-family:var(--display);font-weight:800;font-size:clamp(28px,6vw,40px);line-height:1.1;margin:0 0 6px}
-  .sub{margin:0 0 22px;max-width:52ch}
-  .grid{display:grid;gap:18px}
-  .panel{border:3px solid var(--ink);border-radius:20px;background:var(--paper);padding:18px;box-shadow:5px 5px 0 var(--ink)}
-  .panel h3{font-family:var(--display);font-weight:800;font-size:22px;margin:0 0 4px;line-height:1.2}
-  .panel p.help{margin:0 0 12px;font-size:15px;opacity:.85}
-  .panel.tint{background:var(--mist)}
+  .chat{border:1px solid var(--line);border-radius:24px;background:var(--card);overflow:hidden;
+    box-shadow:0 30px 80px -30px rgba(139,92,246,.55), inset 0 1px 0 rgba(255,255,255,.04)}
+  .chat-head{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:14px 16px;border-bottom:1px solid var(--line-soft)}
+  .live{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px}
+  .live i{width:8px;height:8px;border-radius:50%;background:#EF4444;box-shadow:0 0 8px #EF4444;display:inline-block;animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .chat-body{padding:16px;min-height:250px;display:flex;flex-direction:column;gap:11px}
+  .msg{display:flex;gap:8px;align-items:flex-start;font-size:14.5px;animation:pop .3s ease-out both}
+  .msg b{white-space:nowrap;font-weight:700}
+  .msg span{overflow-wrap:anywhere;color:var(--muted)}
+  .msg.flag span{background:rgba(244,114,182,.12);border:1px dashed var(--danger);border-radius:8px;padding:0 8px;color:#FBCFE8}
+  .msg.bot{background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.35);border-radius:12px;padding:8px 10px;align-items:center}
+  .msg.bot svg{width:26px;height:26px;flex:none}
+  .msg.bot span{color:#CFFAFE}
+  @keyframes pop{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
 
-  /* rows */
+  section.zone{padding:70px 0}
+  .zone-head{max-width:60ch;margin:0 auto 34px;text-align:center}
+  h2{font-family:var(--display);font-weight:800;font-size:clamp(26px,5.2vw,36px);line-height:1.15;margin:0 0 10px;letter-spacing:-.01em}
+  .sub{margin:0;color:var(--muted);font-size:15.5px}
+
+  .steps{display:grid;gap:16px}
+  .step{display:flex;gap:16px;align-items:flex-start;border:1px solid var(--line-soft);border-radius:18px;padding:18px;background:rgba(139,92,246,.04)}
+  .step .num{flex:none;width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    font-family:var(--display);font-weight:800;color:#fff;background:linear-gradient(135deg,var(--violet),var(--cyan));font-size:15px}
+  .step h3{margin:2px 0 4px;font-family:var(--display);font-size:17px}
+  .step p{margin:0;color:var(--muted);font-size:14.5px}
+
+  .grid{display:grid;gap:16px}
+  .panel{border:1px solid var(--line-soft);border-radius:var(--radius);background:var(--card);padding:20px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+  .panel h3{font-family:var(--display);font-weight:700;font-size:17.5px;margin:0 0 4px;letter-spacing:-.005em}
+  .panel p.help{margin:0 0 14px;font-size:13.5px;color:var(--muted2)}
+
   .row{display:flex;gap:10px;align-items:center}
   .row.between{justify-content:space-between}
-  .stack{display:grid;gap:10px}
+  .stack{display:grid;gap:11px}
   input[type=text],input[type=number]{
-    width:100%;border:3px solid var(--ink);border-radius:14px;padding:9px 12px;background:var(--paper);min-width:0
+    width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 13px;
+    background:rgba(6,5,22,.55);color:var(--ink);min-width:0
   }
-  .add{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:12px}
+  input::placeholder{color:var(--muted2)}
+  .add{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:14px}
   .add.two{grid-template-columns:1fr}
   .add.two .row{display:grid;grid-template-columns:1fr;gap:10px}
 
-  /* chips */
   .chips{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{display:inline-flex;align-items:center;gap:6px;border:2.5px solid var(--ink);border-radius:999px;background:var(--sun);padding:3px 6px 3px 12px;font-weight:700}
-  .chip.blue{background:var(--sky)}
-  .x{border:0;background:var(--ink);color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;line-height:1;font-weight:800}
-  .empty{margin:0;padding:12px;border:2.5px dashed var(--ink);border-radius:14px;font-size:15px}
+  .chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;
+    background:rgba(139,92,246,.12);padding:5px 6px 5px 13px;font-weight:600;font-size:13.5px}
+  .chip.blue{background:rgba(34,211,238,.10);border-color:rgba(34,211,238,.4)}
+  .x{border:0;background:rgba(255,255,255,.12);color:#fff;width:20px;height:20px;border-radius:50%;cursor:pointer;line-height:1;font-size:12px}
+  .x:hover{background:var(--danger)}
+  .empty{margin:0;padding:13px;border:1px dashed var(--line);border-radius:14px;font-size:13.5px;color:var(--muted2)}
 
-  /* switch */
-  .switch{width:58px;height:34px;border:3px solid var(--ink);border-radius:999px;background:#CBD5E1;position:relative;cursor:pointer;flex:none;padding:0}
-  .switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--paper);border:3px solid var(--ink);transition:transform .15s}
-  .switch[aria-checked="true"]{background:var(--cyan)}
-  .switch[aria-checked="true"]::after{transform:translateX(24px)}
-  .toggle-row{padding:10px 0;border-top:2.5px solid var(--sky)}
+  .switch{width:50px;height:29px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.06);position:relative;cursor:pointer;flex:none;padding:0}
+  .switch::after{content:"";position:absolute;top:2px;left:2px;width:23px;height:23px;border-radius:50%;background:#fff;transition:transform .15s}
+  .switch[aria-checked="true"]{background:linear-gradient(90deg,var(--violet),var(--cyan));border-color:transparent}
+  .switch[aria-checked="true"]::after{transform:translateX(21px)}
+  .toggle-row{padding:11px 0;border-top:1px solid var(--line-soft)}
   .toggle-row:first-of-type{border-top:0;padding-top:0}
-  .toggle-row strong{display:block;line-height:1.2}
-  .toggle-row small{opacity:.8}
+  .toggle-row strong{display:block;line-height:1.2;font-size:14.5px;font-weight:600}
+  .toggle-row small{color:var(--muted2);font-size:13px}
 
-  /* timeouts */
-  .t-row{display:grid;grid-template-columns:1fr 112px;gap:10px;align-items:center}
-  .t-row label{font-weight:800;line-height:1.2}
-  .t-row small{display:block;font-weight:400;opacity:.85}
-  .err{color:#B91C1C;font-size:14px;margin:4px 0 0;min-height:1em}
+  .t-row{display:grid;grid-template-columns:1fr 104px;gap:10px;align-items:center}
+  .t-row label{font-weight:600;line-height:1.25;font-size:14.5px}
+  .t-row small{display:block;font-weight:400;color:var(--muted2);font-size:12.5px}
+  .err{color:#F87171;font-size:13px;margin:5px 0 0;min-height:1em}
 
-  /* commands */
-  .cmd{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;border:2.5px solid var(--ink);border-radius:14px;padding:8px 10px;background:var(--mist)}
-  .cmd code{font-weight:800;background:var(--sun);border:2px solid var(--ink);border-radius:8px;padding:1px 8px}
-  .cmd span{overflow-wrap:anywhere;font-size:15px}
+  .cmd{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;border:1px solid var(--line-soft);
+    border-radius:14px;padding:9px 11px;background:rgba(6,5,22,.4)}
+  .cmd code{font-weight:700;background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.4);border-radius:8px;padding:2px 8px;color:#CFFAFE;font-size:13px}
+  .cmd span{overflow-wrap:anywhere;font-size:13.5px;color:var(--muted)}
 
-  /* output */
-  .out{background:var(--ink);color:#E0F2FE;border-radius:20px;border:3px solid var(--ink);padding:18px;box-shadow:5px 5px 0 var(--violet)}
-  .out h3{color:#fff}
-  .out p.help{color:#BAE6FD}
-  pre{margin:0 0 14px;padding:14px;border-radius:14px;background:#0F0D2E;color:#67E8F9;overflow:auto;max-height:340px;font-size:14px;line-height:1.5;border:2px solid #312E81}
+  .out{grid-column:1/-1;border:1px solid var(--line);border-radius:var(--radius);
+    background:linear-gradient(180deg, rgba(139,92,246,.14), rgba(6,5,22,.5));
+    padding:22px;box-shadow:0 30px 80px -34px rgba(139,92,246,.6)}
+  pre{margin:0 0 16px;padding:16px;border-radius:14px;background:#050414;color:#B9F3FF;overflow:auto;max-height:340px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.55;border:1px solid var(--line-soft)}
   .out .btns{display:flex;flex-wrap:wrap;gap:12px}
-  .note{margin:14px 0 0;font-size:15px;color:#BAE6FD}
+  .note{margin:16px 0 0;font-size:13.5px;color:var(--muted2)}
 
   .toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,30px);opacity:0;pointer-events:none;
-    background:var(--ink);color:#fff;border:3px solid var(--sun);border-radius:14px;padding:10px 16px;font-weight:700;max-width:90vw;text-align:center;transition:.2s;z-index:10}
+    background:#0c0a26;color:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 18px;font-weight:600;
+    max-width:90vw;text-align:center;transition:.2s;z-index:10;box-shadow:0 12px 40px -12px rgba(139,92,246,.7)}
   .toast.show{opacity:1;transform:translate(-50%,0)}
-  footer{padding:10px 0 40px;font-weight:700}
 
-  @media (min-width:860px){
-    .hero{grid-template-columns:1.05fr 1fr;padding-top:28px}
+  footer{padding:36px 0 50px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    border-top:1px solid var(--line-soft);color:var(--muted2);font-size:13.5px;flex-wrap:wrap}
+
+  @media (min-width:900px){
+    .hero{grid-template-columns:1.05fr 1fr;padding-top:34px}
     .grid{grid-template-columns:1fr 1fr;align-items:start}
     .span2{grid-column:1 / -1}
     .add.two .row{grid-template-columns:170px 1fr}
+    .steps{grid-template-columns:repeat(3,1fr)}
   }
   @media (prefers-reduced-motion:reduce){
-    .msg{animation:none}
+    .msg,.live i{animation:none}
     html{scroll-behavior:auto}
     .switch::after,.btn,.toast{transition:none}
   }
@@ -141,133 +190,151 @@
 <body>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="bot" viewBox="50 48 280 264">
-    <line x1="190" y1="116" x2="190" y2="78" stroke="#1E1B4B" stroke-width="7" stroke-linecap="round"/>
-    <circle cx="190" cy="68" r="15" fill="#F472B6" stroke="#1E1B4B" stroke-width="6"/>
-    <circle cx="74" cy="206" r="22" fill="#A78BFA" stroke="#1E1B4B" stroke-width="6"/>
-    <circle cx="306" cy="206" r="22" fill="#A78BFA" stroke="#1E1B4B" stroke-width="6"/>
-    <rect x="82" y="112" width="216" height="192" rx="82" fill="#FFFFFF" stroke="#1E1B4B" stroke-width="7"/>
-    <rect x="108" y="146" width="164" height="110" rx="50" fill="#312E81"/>
-    <ellipse cx="150" cy="196" rx="21" ry="27" fill="#22D3EE"/>
-    <ellipse cx="230" cy="196" rx="21" ry="27" fill="#22D3EE"/>
-    <circle cx="157" cy="185" r="8" fill="#FFFFFF"/>
-    <circle cx="237" cy="185" r="8" fill="#FFFFFF"/>
-    <circle cx="126" cy="230" r="10" fill="#F472B6"/>
-    <circle cx="254" cy="230" r="10" fill="#F472B6"/>
-    <path d="M174 230 Q190 246 206 230" fill="none" stroke="#22D3EE" stroke-width="6" stroke-linecap="round"/>
+  <defs>
+    <linearGradient id="logoGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#A78BFA"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+  </defs>
+  <symbol id="mark" viewBox="0 0 48 48">
+    <line x1="24" y1="10" x2="24" y2="4" stroke="url(#logoGrad)" stroke-width="2.4" stroke-linecap="round"/>
+    <circle cx="24" cy="4" r="2.4" fill="url(#logoGrad)"/>
+    <rect x="6" y="10" width="36" height="30" rx="12" fill="none" stroke="url(#logoGrad)" stroke-width="2.4"/>
+    <rect x="14.5" y="21" width="7" height="11" rx="3.5" fill="url(#logoGrad)"/>
+    <rect x="26.5" y="21" width="7" height="11" rx="3.5" fill="url(#logoGrad)"/>
   </symbol>
 </svg>
 
 <div class="wrap">
   <header class="top">
-    <div class="brand"><svg role="img" aria-label="Arshubot"><use href="#bot"/></svg>Arshubot</div>
-    <button class="btn ghost small" id="loginBtn" type="button">Google se login</button>
+    <div class="logo"><svg role="img" aria-label="Arshubot"><use href="#mark"/></svg><b>Arshubot</b></div>
+    <button class="btn ghost small" id="loginBtn" type="button">Sign in with Google</button>
   </header>
 
   <main>
     <div class="hero">
       <div>
-        <svg class="hero-mascot" role="img" aria-label="Arshubot robot"><use href="#bot"/></svg>
-        <h1>Chat tumhari, rules bhi tumhare.</h1>
-        <p class="lead">Arshubot gaali aur spam pe turant timeout deta hai. Kaunse words band karne hain aur kitni der ka timeout, ye tum tay karo.</p>
-        <a href="#settings"><button class="btn pink" type="button">Settings badlo</button></a>
+        <span class="eyebrow"><i></i>Built for YouTube live chat</span>
+        <h1>Moderate your stream at the <span class="grad">speed of chat.</span></h1>
+        <p class="lead">Arshubot watches your live chat and times out spam and abuse the instant it happens. You decide the banned words, the timeout lengths, and the commands — every streamer's chat is different.</p>
+        <div class="cta-row">
+          <a href="#settings"><button class="btn glow" type="button">Configure your bot</button></a>
+          <a href="#how"><button class="btn ghost" type="button">How it works</button></a>
+        </div>
+
+        <div class="badges">
+          <div class="badge"><b>3-strike timeouts</b><span>Escalating per repeat offender</span></div>
+          <div class="badge"><b>Your word list</b><span>Add or remove anything</span></div>
+          <div class="badge"><b>Any live stream</b><span>No extra software to install</span></div>
+        </div>
       </div>
 
-      <div class="chat" aria-label="Arshubot ka live chat demo">
+      <div class="chat" aria-label="Arshubot live chat preview">
         <div class="chat-head">
           <span class="live"><i></i>Live chat</span>
-          <button class="btn small ghost" id="replay" type="button">Dobara dikhao</button>
+          <button class="btn small ghost" id="replay" type="button">Replay demo</button>
         </div>
         <div class="chat-body" id="chat" aria-live="polite"></div>
       </div>
     </div>
 
-    <section class="panel-zone" id="settings">
-      <h2>Bot ki settings</h2>
-      <p class="sub">Jo badloge, wo neeche settings.json mein turant dikhega. Wahi file bot padhta hai.</p>
+    <section class="zone" id="how">
+      <div class="zone-head">
+        <h2>Three steps, no server to babysit</h2>
+        <p class="sub">Arshubot is a small script plus a settings file. Change the settings, the bot picks them up.</p>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><div><h3>Configure</h3><p>Set your banned words, timeouts and commands below, then export the settings file.</p></div></div>
+        <div class="step"><div class="num">2</div><div><h3>Connect</h3><p>Point the bot at your live stream and make it a moderator on your channel.</p></div></div>
+        <div class="step"><div class="num">3</div><div><h3>Moderate</h3><p>Arshubot reads every message and reacts — timeouts for abuse and spam, replies for commands.</p></div></div>
+      </div>
+    </section>
+
+    <section class="zone" id="settings">
+      <div class="zone-head">
+        <h2>Bot settings</h2>
+        <p class="sub">Everything here writes straight into settings.json, the file the bot reads.</p>
+      </div>
 
       <div class="grid">
         <div class="panel">
           <div class="row between">
             <div>
-              <h3>Bot</h3>
-              <p class="help" style="margin:0" id="enabledHelp">Bot chalu hai.</p>
+              <h3>Bot status</h3>
+              <p class="help" style="margin:0" id="enabledHelp">Arshubot is active.</p>
             </div>
-            <button class="switch" id="sw-enabled" role="switch" aria-checked="true" aria-label="Bot chalu ya band"></button>
+            <button class="switch" id="sw-enabled" role="switch" aria-checked="true" aria-label="Turn the bot on or off"></button>
           </div>
         </div>
 
         <div class="panel">
-          <h3>Timeout kitni der ka</h3>
-          <p class="help">Har galti pe timeout badhta jata hai. Second mein likho, 10 se 86400 tak.</p>
+          <h3>Timeout lengths</h3>
+          <p class="help">Each repeat offence steps up. Enter seconds, from 10 to 86400.</p>
           <div class="stack">
-            <div>
-              <div class="t-row"><label for="t0">Pehli galti<small id="h0"></small></label><input type="number" id="t0" min="10" max="86400" inputmode="numeric"></div>
-            </div>
-            <div>
-              <div class="t-row"><label for="t1">Doosri galti<small id="h1"></small></label><input type="number" id="t1" min="10" max="86400" inputmode="numeric"></div>
-            </div>
-            <div>
-              <div class="t-row"><label for="t2">Teesri galti aur uske baad<small id="h2"></small></label><input type="number" id="t2" min="10" max="86400" inputmode="numeric"></div>
-            </div>
+            <div class="t-row"><label for="t0">First offence<small id="h0"></small></label><input type="number" id="t0" min="10" max="86400" inputmode="numeric"></div>
+            <div class="t-row"><label for="t1">Second offence<small id="h1"></small></label><input type="number" id="t1" min="10" max="86400" inputmode="numeric"></div>
+            <div class="t-row"><label for="t2">Third offence onward<small id="h2"></small></label><input type="number" id="t2" min="10" max="86400" inputmode="numeric"></div>
           </div>
           <p class="err" id="terr" role="alert"></p>
         </div>
 
         <div class="panel span2">
-          <h3>Band words</h3>
-          <p class="help">Chhote words (4 letters tak) poore word ki tarah match hote hain, taaki galat log na pakde jaayein. Lambe words kahin bhi milein to pakde jaate hain.</p>
+          <h3>Banned words</h3>
+          <p class="help">Short words (4 letters or fewer) only match as a whole word, so real names and normal chat don't get caught. Longer words match anywhere.</p>
           <div class="add">
-            <input type="text" id="wordIn" placeholder="naya word likho" maxlength="30" autocomplete="off" aria-label="Naya band word">
-            <button class="btn small" id="wordAdd" type="button">Word jodo</button>
+            <input type="text" id="wordIn" placeholder="add a word" maxlength="30" autocomplete="off" aria-label="New banned word">
+            <button class="btn small" id="wordAdd" type="button">Add</button>
           </div>
           <div class="chips" id="words"></div>
         </div>
 
         <div class="panel">
-          <h3>Kya pakadna hai</h3>
-          <p class="help">Jo band karoge, bot use nahi pakdega.</p>
+          <h3>What gets flagged</h3>
+          <p class="help">Turn off anything you don't want the bot catching.</p>
           <div id="filters"></div>
         </div>
 
         <div class="panel">
-          <h3>Ye log safe hain</h3>
-          <p class="help">Channel owner aur moderators hamesha safe hain. Baaki dosto ke channel ke naam yahan jodo.</p>
+          <h3>Trusted viewers</h3>
+          <p class="help">Channel owner and moderators are always trusted. Add friends' channel names here too.</p>
           <div class="add">
-            <input type="text" id="wlIn" placeholder="channel ka naam" maxlength="40" autocomplete="off" aria-label="Safe log ka naam">
-            <button class="btn small cyan" id="wlAdd" type="button">Naam jodo</button>
+            <input type="text" id="wlIn" placeholder="channel name" maxlength="40" autocomplete="off" aria-label="Trusted viewer name">
+            <button class="btn small" id="wlAdd" type="button">Add</button>
           </div>
           <div class="chips" id="wl"></div>
         </div>
 
-        <div class="panel span2 tint">
+        <div class="panel span2">
           <h3>Commands</h3>
-          <p class="help">Viewer command likhe to bot ye jawab deta hai. Ek command 5 second mein ek hi baar chalta hai.</p>
+          <p class="help">When a viewer types a command, the bot replies with this. Each command has a 5-second cooldown.</p>
           <div class="add two">
             <div class="row">
-              <input type="text" id="cmdName" placeholder="!discord" maxlength="20" autocomplete="off" aria-label="Command ka naam">
-              <input type="text" id="cmdReply" placeholder="Jawab likho" maxlength="190" autocomplete="off" aria-label="Command ka jawab">
+              <input type="text" id="cmdName" placeholder="!discord" maxlength="20" autocomplete="off" aria-label="Command name">
+              <input type="text" id="cmdReply" placeholder="Reply text" maxlength="190" autocomplete="off" aria-label="Command reply">
             </div>
-            <div><button class="btn small" id="cmdAdd" type="button">Command jodo</button></div>
+            <div><button class="btn small" id="cmdAdd" type="button">Add command</button></div>
           </div>
           <div class="stack" id="cmds" style="margin-top:12px"></div>
         </div>
 
         <div class="out span2">
           <h3>settings.json</h3>
-          <p class="help">Ye tumhari abhi ki settings hain.</p>
-          <pre id="json" tabindex="0" aria-label="settings.json ka preview"></pre>
+          <p class="help">This reflects everything above, live.</p>
+          <pre id="json" tabindex="0" aria-label="settings.json preview"></pre>
           <div class="btns">
-            <button class="btn cyan" id="copy" type="button">Copy settings</button>
-            <button class="btn" id="download" type="button">Download settings.json</button>
+            <button class="btn glow" id="copy" type="button">Copy JSON</button>
+            <button class="btn ghost" id="download" type="button">Download settings.json</button>
           </div>
-          <p class="note">Abhi ye file bot chalane wale ko dena hai, wo ise bot ke folder mein rakhta hai. Login aur online save agle version mein aayenge.</p>
+          <p class="note">Right now this file is handed to whoever runs the bot, who drops it in the bot's folder. Sign-in and cloud save are coming in a later version.</p>
         </div>
       </div>
     </section>
   </main>
 
-  <footer>Arshubot</footer>
+  <footer>
+    <div class="logo"><svg role="img" aria-label="Arshubot" width="22" height="22"><use href="#mark"/></svg><b style="font-size:15px">Arshubot</b></div>
+    <span>Chat moderation for YouTube live streams.</span>
+  </footer>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -289,19 +356,19 @@
   var state = JSON.parse(JSON.stringify(defaults));
 
   var FILTERS = [
-    ["links","Links","Link bhejne wale ko timeout"],
-    ["caps","Zyada CAPS","Sab kuch bade akshar mein likhne wale ko timeout"],
-    ["repeat","Ek hi message baar baar","Ek hi message 3 baar bhejne wale ko timeout"],
-    ["fast_spam","Bahut tez messages","6 second mein 5 ya zyada messages bhejne wale ko timeout"]
+    ["links","Links","Anyone posting a link gets timed out"],
+    ["caps","Excess CAPS","Long messages typed almost entirely in capitals"],
+    ["repeat","Repeated message","The same message sent 3 times in a row"],
+    ["fast_spam","Rapid-fire spam","5 or more messages inside 6 seconds"]
   ];
 
   function $(id){ return document.getElementById(id); }
 
   function fmtDur(s){
-    if (s < 60) return s + " sec";
-    if (s < 3600){ var m = Math.floor(s/60), r = s%60; return m + " min" + (r ? " " + r + " sec" : ""); }
+    if (s < 60) return s + "s";
+    if (s < 3600){ var m = Math.floor(s/60), r = s%60; return m + "m" + (r ? " " + r + "s" : ""); }
     var h = Math.floor(s/3600), mm = Math.floor((s%3600)/60);
-    return h + " ghanta" + (mm ? " " + mm + " min" : "");
+    return h + "h" + (mm ? " " + mm + "m" : "");
   }
 
   var toastTimer;
@@ -311,18 +378,17 @@
     toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2600);
   }
 
-  /* ---------- rendering ---------- */
   function renderEnabled(){
     var sw = $("sw-enabled");
     sw.setAttribute("aria-checked", String(state.enabled));
-    $("enabledHelp").textContent = state.enabled ? "Bot chalu hai." : "Bot band hai. Chat mein kuch nahi karega.";
+    $("enabledHelp").textContent = state.enabled ? "Arshubot is active." : "Arshubot is off. It won't touch chat.";
   }
 
   function chip(text, cls, onRemove){
     var c = document.createElement("span"); c.className = "chip " + (cls || "");
     var s = document.createElement("span"); s.textContent = text;
     var b = document.createElement("button"); b.type = "button"; b.className = "x";
-    b.textContent = "\u00d7"; b.setAttribute("aria-label", text + " hatao");
+    b.textContent = "\u00d7"; b.setAttribute("aria-label", "Remove " + text);
     b.addEventListener("click", onRemove);
     c.appendChild(s); c.appendChild(b); return c;
   }
@@ -331,7 +397,7 @@
     var box = $("words"); box.innerHTML = "";
     if (!state.banned_words.length){
       var p = document.createElement("p"); p.className = "empty";
-      p.textContent = "Abhi koi band word nahi hai. Upar se pehla word jodo."; box.appendChild(p); return;
+      p.textContent = "No banned words yet. Add the first one above."; box.appendChild(p); return;
     }
     state.banned_words.forEach(function(w, i){
       box.appendChild(chip(w, "", function(){ state.banned_words.splice(i,1); renderWords(); renderJSON(); }));
@@ -342,7 +408,7 @@
     var box = $("wl"); box.innerHTML = "";
     if (!state.whitelist.length){
       var p = document.createElement("p"); p.className = "empty";
-      p.textContent = "Abhi koi naam nahi hai."; box.appendChild(p); return;
+      p.textContent = "No trusted viewers added yet."; box.appendChild(p); return;
     }
     state.whitelist.forEach(function(w, i){
       box.appendChild(chip(w, "blue", function(){ state.whitelist.splice(i,1); renderWl(); renderJSON(); }));
@@ -374,14 +440,14 @@
     var names = Object.keys(state.commands);
     if (!names.length){
       var p = document.createElement("p"); p.className = "empty";
-      p.textContent = "Abhi koi command nahi hai. Upar se pehla command jodo."; box.appendChild(p); return;
+      p.textContent = "No commands yet. Add the first one above."; box.appendChild(p); return;
     }
     names.forEach(function(n){
       var r = document.createElement("div"); r.className = "cmd";
       var c = document.createElement("code"); c.textContent = n;
       var s = document.createElement("span"); s.textContent = state.commands[n];
       var b = document.createElement("button"); b.type = "button"; b.className = "x";
-      b.textContent = "\u00d7"; b.setAttribute("aria-label", n + " hatao");
+      b.textContent = "\u00d7"; b.setAttribute("aria-label", "Remove " + n);
       b.addEventListener("click", function(){ delete state.commands[n]; renderCmds(); renderJSON(); });
       r.appendChild(c); r.appendChild(s); r.appendChild(b); box.appendChild(r);
     });
@@ -396,27 +462,26 @@
     for (var i = 0; i < 3; i++){ $("h" + i).textContent = fmtDur(state.timeouts[i]); }
   }
 
-  /* ---------- inputs ---------- */
   function cleanWord(v){ return v.toLowerCase().replace(/\s+/g, "").slice(0, 30); }
 
   function addWord(){
     var inp = $("wordIn"), w = cleanWord(inp.value);
-    if (!w){ toast("Pehle word likho"); return; }
-    if (state.banned_words.indexOf(w) !== -1){ toast("Ye word pehle se list mein hai"); return; }
+    if (!w){ toast("Type a word first"); return; }
+    if (state.banned_words.indexOf(w) !== -1){ toast("That word is already on the list"); return; }
     state.banned_words.push(w); inp.value = ""; renderWords(); renderJSON(); inp.focus();
   }
   function addWl(){
     var inp = $("wlIn"), w = inp.value.trim().slice(0, 40);
-    if (!w){ toast("Pehle naam likho"); return; }
-    if (state.whitelist.indexOf(w) !== -1){ toast("Ye naam pehle se list mein hai"); return; }
+    if (!w){ toast("Type a name first"); return; }
+    if (state.whitelist.indexOf(w) !== -1){ toast("That name is already on the list"); return; }
     state.whitelist.push(w); inp.value = ""; renderWl(); renderJSON(); inp.focus();
   }
   function addCmd(){
     var n = $("cmdName").value.trim().toLowerCase().replace(/\s+/g, "");
     var r = $("cmdReply").value.trim();
-    if (!n || !r){ toast("Command aur jawab dono likho"); return; }
+    if (!n || !r){ toast("Add both a command and a reply"); return; }
     if (n.charAt(0) !== "!") n = "!" + n;
-    if (n.length < 2){ toast("Command ka naam likho"); return; }
+    if (n.length < 2){ toast("Give the command a name"); return; }
     state.commands[n] = r.slice(0, 190);
     $("cmdName").value = ""; $("cmdReply").value = "";
     renderCmds(); renderJSON();
@@ -437,7 +502,7 @@
     inp.addEventListener("input", function(){
       var v = parseInt(inp.value, 10);
       if (isNaN(v) || v < 10 || v > 86400){
-        $("terr").textContent = "Timeout 10 se 86400 second ke beech hona chahiye.";
+        $("terr").textContent = "Timeouts must be between 10 and 86400 seconds.";
         return;
       }
       $("terr").textContent = "";
@@ -446,7 +511,6 @@
     inp.addEventListener("change", function(){ inp.value = state.timeouts[i]; $("terr").textContent = ""; });
   });
 
-  /* ---------- copy / download ---------- */
   function jsonText(){ return JSON.stringify(state, null, 2); }
 
   $("copy").addEventListener("click", function(){
@@ -458,10 +522,10 @@
       var ok = false;
       try { ok = document.execCommand("copy"); } catch(e){}
       document.body.removeChild(ta);
-      toast(ok ? "Settings copy ho gayi" : "Copy nahi hui. Download wala button try karo.");
+      toast(ok ? "Settings copied" : "Copy failed — try the download button.");
     }
     if (navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(function(){ toast("Settings copy ho gayi"); }, fallback);
+      navigator.clipboard.writeText(text).then(function(){ toast("Settings copied"); }, fallback);
     } else { fallback(); }
   });
 
@@ -471,14 +535,13 @@
     var a = document.createElement("a"); a.href = url; a.download = "settings.json";
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
-    toast("settings.json download ho rahi hai");
+    toast("Downloading settings.json");
   });
 
   $("loginBtn").addEventListener("click", function(){
-    toast("Google login abhi ready nahi hai. Abhi neeche se settings.json lo.");
+    toast("Google sign-in isn't wired up yet — use the download button below for now.");
   });
 
-  /* ---------- hero chat demo ---------- */
   var chat = $("chat"), timers = [], botTimeoutEl = null;
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -495,7 +558,7 @@
     var m = document.createElement("div"); m.className = "msg bot";
     var ns = "http://www.w3.org/2000/svg";
     var svg = document.createElementNS(ns, "svg"); svg.setAttribute("aria-hidden", "true");
-    var use = document.createElementNS(ns, "use"); use.setAttribute("href", "#bot"); svg.appendChild(use);
+    var use = document.createElementNS(ns, "use"); use.setAttribute("href", "#mark"); svg.appendChild(use);
     var s = document.createElement("span"); s.textContent = text;
     m.appendChild(svg); m.appendChild(s); return { el: m, txt: s };
   }
@@ -503,10 +566,10 @@
   function runDemo(){
     timers.forEach(clearTimeout); timers = []; chat.innerHTML = ""; botTimeoutEl = null;
     var steps = [
-      function(){ chat.appendChild(userMsg("riya_gamer", "bhai aaj ka stream mast hai", "#7C3AED")); },
-      function(){ chat.appendChild(userMsg("vikas99", "!ping", "#0E7490")); },
+      function(){ chat.appendChild(userMsg("riya_gamer", "loving tonight's stream", "#A78BFA")); },
+      function(){ chat.appendChild(userMsg("vikas99", "!ping", "#22D3EE")); },
       function(){ chat.appendChild(botMsg("pong").el); },
-      function(){ chat.appendChild(userMsg("spamking", "\u2022\u2022\u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022\u2022", "#BE185D", true)); },
+      function(){ chat.appendChild(userMsg("spamking", "\u2022\u2022\u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022\u2022", "#F472B6", true)); },
       function(){ var b = botMsg(timeoutLine()); botTimeoutEl = b.txt; chat.appendChild(b.el); }
     ];
     steps.forEach(function(fn, i){
@@ -515,7 +578,6 @@
   }
   $("replay").addEventListener("click", runDemo);
 
-  /* ---------- init ---------- */
   renderEnabled(); renderWords(); renderWl(); renderFilters(); renderCmds();
   renderTimeoutHints(); renderJSON(); runDemo();
 })();
